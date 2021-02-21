@@ -4,7 +4,7 @@
 
 ## Description
 
-he app monitors weather forecasts for specific locations. If in the next five days the temperature exceeds a given lower limit, the system gives warnings in the REST API response. The app is integrated with two weather forecast services OpenWeatherMap and WeatherAPI.
+The app monitors weather forecasts for specific locations. If in the next five days the temperature exceeds a given lower limit, the system gives warnings in the REST API response. The app is integrated with two weather forecast services OpenWeatherMap and WeatherAPI.
 
 ## Used technologies
 - NestJS
