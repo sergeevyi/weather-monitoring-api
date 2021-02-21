@@ -21,7 +21,7 @@ Frequency (milliseconds), the list of locations (cities), and lower temperature 
 ## Running the app
 -  Clone repository
 ```bash
-$ git clone https://github.com/onwuvic/nest-blog-api.git
+$ git clone https://github.com/sergeevyi/weather-monitoring-api
 ```
 - Populate the required parameters in .env and settings.json files
 
