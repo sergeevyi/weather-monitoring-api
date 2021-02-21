@@ -27,8 +27,8 @@ export class WeatherapiProvider implements IWeatherProvider {
       .pipe(
         map((response) => {
           this.logger.warn(response.data);
-          const todos: WeatherApiRespDto = response.data;
-          return todos.forecast.forecastday
+          const forecastList: WeatherApiRespDto = response.data;
+          return forecastList.forecast.forecastday
             .filter((item) => item.day.avgtemp_c < limit)
             .map(
               (item: Forecastday) =>
