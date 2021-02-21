@@ -1,0 +1,10 @@
+{
+  "frequency": 30000,
+  "cities": [
+    {
+      "name": "Berlin",
+      "limit": 7
+    }
+  ]
+}
+

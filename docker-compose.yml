@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: weather_forecast
+    volumes:
+      - mongo_data:/data/db
+  api:
+    restart: unless-stopped
+    build:
+      context: .
+    command: yarn start:dev
+    ports:
+      - 3000:3000
+    volumes:
+      - ./settings.json:/app/settings.json
+    env_file:
+      - .env
+    links:
+      - mongo
+    depends_on:
+      - mongo
+volumes:
+  mongo_data:
