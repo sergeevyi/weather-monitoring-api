@@ -38,20 +38,24 @@ export class WeatherService implements OnModuleInit {
     }));
   }
 
-  private getSettings = (): IConfig => {
-    const file = fs.readFileSync(
-      this.configService.get<string>('CONFIG_FILE'),
-      'utf8',
-    );
-    const config: IConfig = JSON.parse(file);
-    return config;
+  getSettings = async (): Promise<IConfig> => {
+    try {
+      const data: string = await fs.promises.readFile(
+        this.configService.get<string>('CONFIG_FILE'),
+        'utf8',
+      );
+      const config: IConfig = JSON.parse(data);
+      return config;
+    } catch (err) {
+      this.logger.error(err);
+    }
   };
 
   async onModuleInit() {
     this.weatherProviderService = await this.moduleRef.get(
       this.configService.get<string>('WEATHER_PROVIDER'),
     );
-    const config = this.getSettings();
+    const config = await this.getSettings();
     this.frequency = config.frequency;
     this.startWeatherJob(this.frequency);
   }
@@ -63,8 +67,8 @@ export class WeatherService implements OnModuleInit {
 
   // Check the settings file every 1 min for changes. If the frequency has been changed, restart a scheduled task with a new frequency
   @Interval(60000)
-  checkSettings() {
-    const config = this.getSettings();
+  async checkSettings() {
+    const config = await this.getSettings();
     if (this.frequency !== config.frequency) {
       this.schedulerRegistry.deleteInterval('weatherJob');
       this.startWeatherJob(config.frequency);
@@ -72,11 +76,11 @@ export class WeatherService implements OnModuleInit {
     }
   }
 
-  handleWeatherJob() {
+  async handleWeatherJob() {
     this.weatherModel.collection
       .deleteMany({})
       .catch((err) => this.logger.error(err));
-    const config = this.getSettings();
+    const config = await this.getSettings();
     const api_key = this.configService.get<string>('WEATHERAPI_KEY');
     config.cities.forEach((city: City) => {
       this.weatherProviderService

@@ -8,6 +8,7 @@ import { mockedConfigService } from '../../utils/mocks/config.service';
 import { Weather, WeatherSchema } from '../schemas/weather.schema';
 import { IWeather } from '../interfaces/weather.interface';
 import { Model } from 'mongoose';
+import * as fs from 'fs';
 
 const weatherDoc = {
   _id: '53d53d2s',
@@ -113,5 +114,32 @@ describe('WeatherService', () => {
       .mockImplementationOnce(() => Promise.resolve(weatherDocs));
     const newWeatherDocs = await weatherModel.create(weatherArray);
     expect(newWeatherDocs).toEqual(weatherDocs);
+  });
+
+  function wait(ms, value) {
+    return new Promise((resolve) => setTimeout(resolve, ms, value));
+  }
+
+  it('should read a file and return IConfig', async () => {
+    const settingsMock = {
+      frequency: 30000,
+      cities: [
+        {
+          name: 'Berlin',
+          limit: 12,
+        },
+        {
+          name: 'Helsinki',
+          limit: 5,
+        },
+      ],
+    };
+    jest.useFakeTimers();
+    const spy = jest
+      .spyOn(fs.promises, 'readFile')
+      .mockResolvedValue(JSON.stringify(settingsMock));
+    const data = await service.getSettings();
+    console.log(data);
+    expect(data).toEqual(settingsMock);
   });
 });
