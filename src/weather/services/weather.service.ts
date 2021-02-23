@@ -1,10 +1,4 @@
-import {
-  HttpService,
-  Inject,
-  Injectable,
-  Logger,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Weather } from '../schemas/weather.schema';
@@ -57,9 +51,6 @@ export class WeatherService implements OnModuleInit {
     this.weatherProviderService = await this.moduleRef.get(
       this.configService.get<string>('WEATHER_PROVIDER'),
     );
-    const callback = () => {
-      this.logger.warn(`Interval  executing at time )!`);
-    };
     const config = this.getSettings();
     this.frequency = config.frequency;
     this.startWeatherJob(this.frequency);

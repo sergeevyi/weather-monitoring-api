@@ -7,9 +7,9 @@ import { WeatherDTO } from '../dto/weather.dto';
 import { Forecastday, WeatherApiRespDto } from '../dto/weatherapi_resp.dto';
 
 @Injectable()
-export class WeatherapiProvider implements IWeatherProvider {
+export class WeatherApiProvider implements IWeatherProvider {
   constructor(private httpService: HttpService) {}
-  private readonly logger = new Logger(WeatherapiProvider.name);
+  private readonly logger = new Logger(WeatherApiProvider.name);
 
   getWeatherByCity = (
     city: string,
@@ -26,16 +26,19 @@ export class WeatherapiProvider implements IWeatherProvider {
       )
       .pipe(
         map((response) => {
-          this.logger.warn(response.data);
+          //this.logger.warn(response.data);
           const forecastList: WeatherApiRespDto = response.data;
           return forecastList.forecast.forecastday
-            .filter((item) => item.day.avgtemp_c < limit)
+            .filter(
+              (item) =>
+                item.date && item.day.avgtemp_c && item.day.avgtemp_c < limit,
+            )
             .map(
               (item: Forecastday) =>
                 new WeatherDTO(
                   city.toLowerCase(),
                   item.day.avgtemp_c,
-                  new Date(item.date),
+                  new Date(Date.parse(item.date + 'T00:00:00.000Z')),
                 ),
             );
         }),

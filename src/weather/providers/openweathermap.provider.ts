@@ -1,7 +1,7 @@
 import { IWeatherProvider } from '../interfaces/weatherprovider.interface';
-import { map } from 'rxjs/operators';
-import { HttpService, Injectable, Logger } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { HttpService, Inject, Injectable, Logger } from '@nestjs/common';
+import { Observable, throwError } from 'rxjs';
 import { WeatherDTO } from '../dto/weather.dto';
 import { List, OpenWeatherMapRespDto } from '../dto/openweathermap_resp_dto';
 
@@ -25,17 +25,23 @@ export class OpenWeatherMapProvider implements IWeatherProvider {
       )
       .pipe(
         map((response) => {
-          const todos: OpenWeatherMapRespDto = response.data;
-          return todos.list
-            .filter((item) => item.main.temp < limit)
+          const items: OpenWeatherMapRespDto = response.data;
+          return items.list
+            .filter(
+              (item) => item.main.temp && item.dt_txt && item.main.temp < limit,
+            )
             .map(
               (item: List) =>
                 new WeatherDTO(
                   city.toLowerCase(),
                   item.main.temp,
-                  new Date(item.dt_txt),
+                  new Date(Date.parse(item.dt_txt + '.000Z')),
                 ),
             );
+        }),
+        catchError((err: Error) => {
+          this.logger.error(err);
+          return throwError(err);
         }),
       );
   };

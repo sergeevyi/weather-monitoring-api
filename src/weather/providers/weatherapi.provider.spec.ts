@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OpenWeatherMapProvider } from './openweathermap.provider';
 import { HttpModule, HttpService } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
+import { WeatherApiProvider } from './weatherapi.provider';
 
-describe('OpenWeatherMapService', () => {
-  let service: OpenWeatherMapProvider;
+describe('WeatherApiProvider', () => {
+  let service: WeatherApiProvider;
   let httpService: HttpService;
 
   const mockWeatherProviderService = () => ({
@@ -15,9 +16,9 @@ describe('OpenWeatherMapService', () => {
     const fakeProductModel = jest.fn();
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule],
-      providers: [OpenWeatherMapProvider],
+      providers: [WeatherApiProvider],
     }).compile();
-    service = module.get<OpenWeatherMapProvider>(OpenWeatherMapProvider);
+    service = module.get<WeatherApiProvider>(WeatherApiProvider);
     httpService = module.get(HttpService);
   });
 
@@ -34,7 +35,7 @@ describe('OpenWeatherMapService', () => {
       .spyOn(service['httpService'], 'get')
       .mockReturnValue(throwError('request failed'));
     let data = {};
-    service.getWeatherByCity('Helsinki', -6, 'apikey').subscribe({
+    service.getWeatherByCity('Berlin', 12, 'apikey').subscribe({
       next: (val) => {
         data = val;
       },
@@ -52,7 +53,7 @@ describe('OpenWeatherMapService', () => {
   it('should do get request and return entries', (done) => {
     jest.spyOn(service['httpService'], 'get').mockReturnValue(
       of({
-        data: require('../../utils/mocks/openweather_resp.json'),
+        data: require('../../utils/mocks/weatherapi_resp.json'),
         status: 200,
         statusText: 'OK',
         headers: {},
@@ -60,7 +61,7 @@ describe('OpenWeatherMapService', () => {
       }),
     );
     let data = {};
-    service.getWeatherByCity('Helsinki', -6, 'apikey').subscribe({
+    service.getWeatherByCity('Berlin', 12, 'apikey').subscribe({
       next: (val) => {
         data = val;
       },
@@ -69,7 +70,7 @@ describe('OpenWeatherMapService', () => {
       },
       complete: () => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const openWeatherMapExpect = require('../../utils/mocks/openweather_expect.json');
+        const openWeatherMapExpect = require('../../utils/mocks/weatherapi_expect.json');
         openWeatherMapExpect.map((item) => (item.date = new Date(item.date)));
         expect(data).toEqual(openWeatherMapExpect);
         done();
@@ -80,7 +81,7 @@ describe('OpenWeatherMapService', () => {
   it('should do get request and get response with incorrect data ( temp field is missing )', (done) => {
     jest.spyOn(service['httpService'], 'get').mockReturnValue(
       of({
-        data: require('../../utils/mocks/openweather_incorect_data_resp.json'),
+        data: require('../../utils/mocks/weatherapi_incorect_data_resp.json'),
         status: 200,
         statusText: 'OK',
         headers: {},
@@ -88,7 +89,7 @@ describe('OpenWeatherMapService', () => {
       }),
     );
     let data = {};
-    service.getWeatherByCity('Helsinki', -6, 'apikey').subscribe({
+    service.getWeatherByCity('Berlin', 12, 'apikey').subscribe({
       next: (val) => {
         data = val;
       },
@@ -97,7 +98,7 @@ describe('OpenWeatherMapService', () => {
       },
       complete: () => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const openWeatherMapExpect = require('../../utils/mocks/openweather_incorect_data_expect.json');
+        const openWeatherMapExpect = require('../../utils/mocks/weatherapi_incorect_data_expect.json');
         openWeatherMapExpect.map((item) => (item.date = new Date(item.date)));
         expect(data).toEqual(openWeatherMapExpect);
         done();
@@ -109,7 +110,7 @@ describe('OpenWeatherMapService', () => {
     jest.spyOn(service['httpService'], 'get').mockImplementation(() => {
       return throwError(new Error('Request failed with status code 401'));
     });
-    service.getWeatherByCity('Helsinki', -6, 'apikey').subscribe({
+    service.getWeatherByCity('Berlin', 12, 'apikey').subscribe({
       error: (err: Error) => {
         expect(err.message).toBe('Request failed with status code 401');
         done();

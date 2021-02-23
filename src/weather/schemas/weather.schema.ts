@@ -1,7 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import * as mongoose from 'mongoose';
-import { IWeather } from '../interfaces/weather.interface';
 
 @Schema()
 export class Weather extends Document {

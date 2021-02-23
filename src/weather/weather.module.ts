@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Weather, WeatherSchema } from './schemas/weather.schema';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OpenWeatherMapProvider } from './providers/openweathermap.provider';
-import { WeatherapiProvider } from './providers/weatherapi.provider';
+import { WeatherApiProvider } from './providers/weatherapi.provider';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -34,7 +34,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     WeatherService,
     {
       provide: 'WEATHERAPI',
-      useClass: WeatherapiProvider,
+      useClass: WeatherApiProvider,
     },
     {
       provide: 'OPENWEATHERMAP',
