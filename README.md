@@ -4,7 +4,7 @@
 
 ## Description
 
-The app monitors weather forecasts for specific locations. If in the next five days the temperature exceeds a given lower limit, the system gives warnings in the REST API response. The app is integrated with two weather forecast services OpenWeatherMap and WeatherAPI.
+The app monitors weather forecasts for specific locations. If in the next five days the temperature exceeds a given lower limit, the system gives warnings in the REST API response. The app is integrated with two weather forecast services [OpenWeatherMap](https://openweathermap.org/) and [WeatherAPI](https://www.weatherapi.com/).
 
 ## Used technologies
 - NestJS
@@ -22,6 +22,10 @@ Frequency (milliseconds), the list of locations (cities), and lower temperature 
 -  Clone repository
 ```bash
 $ git clone https://github.com/sergeevyi/weather-monitoring-api
+```
+- Switch to the repo folder
+```bash
+cd weather-monitoring-api
 ```
 - Populate the required parameters in .env and settings.json files
 
