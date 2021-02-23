@@ -134,12 +134,10 @@ describe('WeatherService', () => {
         },
       ],
     };
-    jest.useFakeTimers();
     const spy = jest
       .spyOn(fs.promises, 'readFile')
       .mockResolvedValue(JSON.stringify(settingsMock));
     const data = await service.getSettings();
-    console.log(data);
     expect(data).toEqual(settingsMock);
   });
 });

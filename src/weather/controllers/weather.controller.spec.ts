@@ -1,37 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WeatherController } from './weather.controller';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { WeatherService } from '../services/weather.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { ConfigService } from '@nestjs/config';
-import { IWeather } from '../interfaces/weather.interface';
 import { WeatherModule } from '../weather.module';
-
-function setup() {
-  const req = {
-    params: {},
-    body: {},
-  };
-  const res = {};
-  Object.assign(res, {
-    status: jest.fn(
-      function status() {
-        return this;
-      }.bind(res),
-    ),
-    json: jest.fn(
-      function json() {
-        return this;
-      }.bind(res),
-    ),
-    send: jest.fn(
-      function send() {
-        return this;
-      }.bind(res),
-    ),
-  });
-  return { req, res };
-}
 
 const mockedWeatherList = [
   {
@@ -49,7 +21,6 @@ const mockedWeatherList = [
 describe('WeatherController', () => {
   let controller: WeatherController;
   let weatherService: WeatherService;
-  let app: INestApplication;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -71,8 +42,6 @@ describe('WeatherController', () => {
     }).compile();
     controller = module.get<WeatherController>(WeatherController);
     weatherService = module.get<WeatherService>(WeatherService);
-    app = module.createNestApplication();
-    await app.init();
   });
 
   it('should be defined', () => {
@@ -88,21 +57,13 @@ describe('WeatherController', () => {
       },
     ];
 
-    jest
-      .spyOn(weatherService, 'findAll')
-      .mockImplementation(
-        async (): Promise<IWeather[]> => Promise.resolve(weatherList),
-      );
+    jest.spyOn(weatherService, 'findAll').mockResolvedValue(weatherList);
     expect(await controller.getAll(null)).toBe(weatherList);
   });
 
   it('should return an empty array', async () => {
     const weatherList: any = [];
-    jest
-      .spyOn(weatherService, 'findAll')
-      .mockImplementation(
-        async (): Promise<IWeather[]> => Promise.resolve(weatherList),
-      );
+    jest.spyOn(weatherService, 'findAll').mockResolvedValue(weatherList);
     expect(await controller.getAll(null)).toBe(weatherList);
   });
 });
