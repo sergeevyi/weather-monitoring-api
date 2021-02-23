@@ -6,9 +6,9 @@ import { Cron, Interval, SchedulerRegistry } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { IWeatherProvider } from '../interfaces/weatherprovider.interface';
 import { WeatherDTO } from '../dto/weather.dto';
-import * as fs from 'fs';
 import { City, IConfig } from '../interfaces/config.interface';
 import { ModuleRef } from '@nestjs/core';
+import getSettings from '../../utils/helpers';
 
 @Injectable()
 export class WeatherService implements OnModuleInit {
@@ -38,26 +38,19 @@ export class WeatherService implements OnModuleInit {
     }));
   }
 
-  getSettings = async (): Promise<IConfig> => {
-    try {
-      const data: string = await fs.promises.readFile(
-        this.configService.get<string>('CONFIG_FILE'),
-        'utf8',
-      );
-      const config: IConfig = JSON.parse(data);
-      return config;
-    } catch (err) {
-      this.logger.error(err);
-    }
-  };
-
   async onModuleInit() {
     this.weatherProviderService = await this.moduleRef.get(
       this.configService.get<string>('WEATHER_PROVIDER'),
     );
-    const config = await this.getSettings();
-    this.frequency = config.frequency;
-    this.startWeatherJob(this.frequency);
+    const config = await getSettings(
+      this.configService.get<string>('CONFIG_FILE'),
+    );
+    if (config) {
+      this.frequency = config.frequency;
+      this.startWeatherJob(this.frequency);
+    } else {
+      this.logger.error('No config set');
+    }
   }
 
   private startWeatherJob = (frequency: number) => {
@@ -68,8 +61,10 @@ export class WeatherService implements OnModuleInit {
   // Check the settings file every 1 min for changes. If the frequency has been changed, restart a scheduled task with a new frequency
   @Interval(60000)
   async checkSettings() {
-    const config = await this.getSettings();
-    if (this.frequency !== config.frequency) {
+    const config = await getSettings(
+      this.configService.get<string>('CONFIG_FILE'),
+    );
+    if (config && this.frequency !== config.frequency) {
       this.schedulerRegistry.deleteInterval('weatherJob');
       this.startWeatherJob(config.frequency);
       this.frequency = config.frequency;
@@ -80,21 +75,27 @@ export class WeatherService implements OnModuleInit {
     this.weatherModel.collection
       .deleteMany({})
       .catch((err) => this.logger.error(err));
-    const config = await this.getSettings();
+    const config = await getSettings(
+      this.configService.get<string>('CONFIG_FILE'),
+    );
     const api_key = this.configService.get<string>('WEATHERAPI_KEY');
-    config.cities.forEach((city: City) => {
-      this.weatherProviderService
-        .getWeatherByCity(city.name, city.limit, api_key)
-        .subscribe(
-          (items: WeatherDTO[]) => {
-            this.weatherModel
-              .create(items)
-              .catch((err) => this.logger.error(err));
-          },
-          (error) => {
-            this.logger.error(error);
-          },
-        );
-    });
+    if (api_key) {
+      config.cities.forEach((city: City) => {
+        this.weatherProviderService
+          .getWeatherByCity(city.name, city.limit, api_key)
+          .subscribe(
+            (items: WeatherDTO[]) => {
+              this.weatherModel
+                .create(items)
+                .catch((err) => this.logger.error(err));
+            },
+            (error) => {
+              this.logger.error(error);
+            },
+          );
+      });
+    } else {
+      this.logger.warn('No API key set');
+    }
   }
 }
