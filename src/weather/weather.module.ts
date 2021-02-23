@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OpenWeatherMapProvider } from './providers/openweathermap.provider';
 import { WeatherApiProvider } from './providers/weatherapi.provider';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './services/tasks.service';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ScheduleModule } from '@nestjs/schedule';
   ],
   providers: [
     WeatherService,
+    TasksService,
     {
       provide: 'WEATHERAPI',
       useClass: WeatherApiProvider,

@@ -1,5 +1,4 @@
 import { IWeatherProvider } from '../interfaces/weatherprovider.interface';
-
 import { catchError, map } from 'rxjs/operators';
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
@@ -26,7 +25,6 @@ export class WeatherApiProvider implements IWeatherProvider {
       )
       .pipe(
         map((response) => {
-          //this.logger.warn(response.data);
           const forecastList: WeatherApiRespDto = response.data;
           return forecastList.forecast.forecastday
             .filter(

@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OpenWeatherMapProvider } from './openweathermap.provider';
 import { HttpModule, HttpService } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
 import { WeatherApiProvider } from './weatherapi.provider';
@@ -7,10 +6,6 @@ import { WeatherApiProvider } from './weatherapi.provider';
 describe('WeatherApiProvider', () => {
   let service: WeatherApiProvider;
   let httpService: HttpService;
-
-  const mockWeatherProviderService = () => ({
-    getWeatherByCity: jest.fn(),
-  });
 
   beforeEach(async () => {
     const fakeProductModel = jest.fn();
